@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>班会课 · 深度学习与卷积神经网络 | CNN 从原理到可视化</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #eef2ff 0%, #e0e7ff 100%);
+            color: #0f172a;
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .slides-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .slide {
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.25);
+            padding: 2rem 2rem 2.2rem;
+            transition: transform 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .slide:hover {
+            transform: translateY(-4px);
+        }
+
+        .chapter-badge {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid #3b82f6;
+            padding-left: 1rem;
+            color: #0f172a;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin: 1rem 0 0.6rem 0;
+            color: #1e40af;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0 1.5rem;
+        }
+        .info-card {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.4rem;
+            flex: 1 1 220px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+        }
+        .info-card strong {
+            font-size: 1.1rem;
+            color: #2563eb;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .two-column {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            margin: 1rem 0;
+        }
+        .col {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .math-block {
+            background: #eef2ff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1.2rem;
+            font-size: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .conv-demo {
+            background: #fefce8;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            border: 2px solid #facc15;
+            margin: 1rem 0;
+        }
+
+        .matrix {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            background: white;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            margin: 0.3rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .conv-result {
+            background: #dcfce7;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .img-placeholder {
+            background: #f1f5f9;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            text-align: center;
+            border: 1px dashed #94a3b8;
+            margin: 1rem 0;
+        }
+        .img-placeholder img {
+            max-width: 100%;
+            border-radius: 1rem;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .diagram-caption {
+            font-size: 0.8rem;
+            color: #475569;
+            margin-top: 0.5rem;
+        }
+
+        .quote {
+            background: #fef9e3;
+            border-left: 6px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            border-radius: 1.2rem;
+            margin: 1.2rem 0;
+        }
+
+        .footnote {
+            font-size: 0.8rem;
+            color: #475569;
+            text-align: center;
+            margin-top: 1.8rem;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 1rem;
+        }
+        @media (max-width: 700px) {
+            .slide { padding: 1.5rem; }
+            h1 { font-size: 1.9rem; }
+            h2 { font-size: 1.5rem; }
+        }
+        .bullet-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .bullet-list li {
+            margin-bottom: 0.6rem;
+            padding-left: 1.4rem;
+            position: relative;
+        }
+        .bullet-list li::before {
+            content: "▹";
+            color: #3b82f6;
+            position: absolute;
+            left: 0;
+        }
+        .btn-demo {
+            display: inline-block;
+            background: #1e293b;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+        }
+        .btn-demo:hover {
+            background: #3b82f6;
+        }
+        .kernel-guess {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="slides-container">
+    <!-- 封面：卷积神经网络专题 -->
+    <div class="slide">
+        <span class="chapter-badge">🧠 深度学习 · 计算机视觉基石</span>
+        <h1>卷积神经网络 CNN<br>让机器真正“看见”</h1>
+        <div class="card-grid">
+            <div class="info-card"><strong>🧩 核心操作</strong> 卷积 · 特征提取</div>
+            <div class="info-card"><strong>👁️ 生物启发</strong> 感受野 + 层次化视觉</div>
+            <div class="info-card"><strong>⚙️ 经典结构</strong> LeNet → AlexNet → ResNet</div>
+        </div>
+        <div class="quote">📸 “卷积神经网络模仿了大脑处理视觉信息的方式 — 从边缘、纹理到复杂物体。” — 10~12分钟班会探索</div>
+    </div>
+
+    <!-- 1. 为什么需要CNN？ MLP的局限 -->
+    <div class="slide">
+        <span class="chapter-badge">📉 困境与突破</span>
+        <h2>为什么MLP不够？空间信息 + 参数爆炸</h2>
+        <div class="two-column">
+            <div class="col">
+                <ul class="bullet-list">
+                    <li><strong>参数爆炸</strong>：1000×1000图片输入MLP，仅输入层就10⁶维，全连接层参数量巨大，极易过拟合。</li>
+                    <li><strong>丢失空间结构</strong>：展平为一维向量后，像素的邻居关系被破坏，“眼睛在鼻子上面”这类信息消失。</li>
+                    <li><strong>无特征重用</strong>：每个像素单独学习权重，无法利用局部模式（如边缘、角点）的重复性。</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="img-placeholder">
+                    <div style="background:#e0e7ff; border-radius: 1rem; padding: 0.5rem;">
+                        🖼️ 全连接网络(MLP) VS 🧩 卷积神经网络(CNN)<br>
+                        <span style="font-size:0.8rem;">CNN通过<span class="tag">局部连接</span> + <span class="tag">权值共享</span>大幅减少参数量</span>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top:0.5rem;">✨ 灵感来源：生物的视觉皮层 — 神经元只响应视野中的局部区域（感受野），高层整合为整体。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 卷积操作 + 手算互动环节 -->
+    <div class="slide">
+        <span class="chapter-badge">🧮 核心运算</span>
+        <h2>卷积：滑动窗口内的加权和</h2>
+        <div class="conv-demo">
+            <h3>✋ 手算互动 · 邀请同学一起算！</h3>
+            <div class="two-column">
+                <div class="col">
+                    <div><strong>输入特征图 (5x5)</strong></div>
+                    <div class="matrix">
+                        1 &nbsp; 2 &nbsp; 3 &nbsp; 0 &nbsp; 1<br>
+                        0 &nbsp; 1 &nbsp; 2 &nbsp; 3 &nbsp; 4<br>
+                        1 &nbsp; 0 &nbsp; 1 &nbsp; 2 &nbsp; 3<br>
+                        4 &nbsp; 3 &nbsp; 2 &nbsp; 1 &nbsp; 0<br>
+                        1 &nbsp; 2 &nbsp; 3 &nbsp; 4 &nbsp; 5
+                    </div>
+                </div>
+                <div class="col">
+                    <div><strong>卷积核 (3x3) 垂直边缘检测</strong></div>
+                    <div class="matrix">
+                        1 &nbsp; 0 &nbsp; -1<br>
+                        1 &nbsp; 0 &nbsp; -1<br>
+                        1 &nbsp; 0 &nbsp; -1
+                    </div>
+                </div>
+            </div>
+            <p><strong>步骤：</strong> 将卷积核放在左上角，对应元素相乘再求和 → 输出特征图的第一个值。</p>
+            <div class="conv-result">
+                🧮 计算过程： (1×1)+(2×0)+(3×(-1)) + (0×1)+(1×0)+(2×(-1)) + (1×1)+(0×0)+(1×(-1)) <br>
+                = 1 + 0 - 3 + 0 + 0 - 2 + 1 + 0 - 1 = <strong style="font-size:1.2rem;"> -4 </strong> ✅
+            </div>
+            <p>然后滑动核（步长=1）继续向右，直到遍历整张图 → 生成<strong>特征图 (Feature Map)</strong>。卷积核就像是“模式探照灯”。</p>
+        </div>
+    </div>
+
+    <!-- 3. 猜卷积核效果 + 两个特效图 -->
+    <div class="slide">
+        <span class="chapter-badge">🔍 侦探游戏</span>
+        <h2>猜猜卷积核提取了什么特征？</h2>
+        <div class="two-column">
+            <div class="col">
+                <div class="img-placeholder">
+                    <img src="images/卷积核效果1.png" alt="水平边缘检测效果图" onerror="this.src='https://placehold.co/400x300?text=示例：水平边缘提取'; this.onerror=null;">
+                    <div class="diagram-caption">✨ 效果图1：原图经过核A后的输出</div>
+                </div>
+                <div class="math-block">
+                    <strong>🔸 卷积核 A</A></strong><br>
+                    <div style="display: inline-block; background: #1e293b; padding: 0.6rem 1rem; border-radius: 1rem; margin-top: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 2rem); gap: 0.3rem; text-align: center; color: white; font-weight: 600;">
+                            <span>-1</span> <span>-2</span> <span>-1</span>
+                            <span>0</span> <span>0</span> <span>0</span>
+                            <span>1</span> <span>2</span> <span>1</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">✅ 实际效果：提取图像中的<strong>横向纹理</strong>，桥梁、台阶等水平结构被点亮。</div>
+            </div>
+            <div class="col">
+                <div class="img-placeholder">
+                    <img src="images/卷积核效果2.png" alt="垂直边缘检测效果图" onerror="this.src='https://placehold.co/400x300?text=示例：垂直边缘提取'; this.onerror=null;">
+                    <div class="diagram-caption">✨ 效果图2：原图经过核B后的输出</div>
+                </div>
+                <div class="math-block">
+                    <strong>🔸 卷积核 B</strong><br>
+                    <div style="display: inline-block; background: #1e293b; padding: 0.6rem 1rem; border-radius: 1rem; margin-top: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 2rem); gap: 0.3rem; text-align: center; color: white; font-weight: 600;">
+                            <span>-1</span> <span>0</span> <span>1</span>
+                            <span>-2</span> <span>0</span> <span>2</span>
+                            <span>-1</span> <span>0</span> <span>1</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote">✅ 实际效果：<strong>竖向线条</strong>被强烈激活，形成发光轮廓。</div>
+            </div>
+        </div>
+        <p class="footnote">💡 浅层卷积核学习边缘/颜色 → 深层卷积核学习眼睛、车轮、文字局部 → 最终认出物体。</p>
+    </div>
+
+    <!-- 4. 不同层次卷积核可视化 -->
+    <div class="slide">
+        <span class="chapter-badge">👁️ 层层递进</span>
+        <h2>深层网络学什么？卷积核可视化</h2>
+        <div class="img-placeholder">
+            <img src="images/不同层次卷积核示意.png" alt="不同层次卷积核可视化示意 (第一层边缘，中间层纹理/部件，高层物体)" onerror="this.src='https://placehold.co/800x300?text=Layer1:边缘/颜色 → Layer2:纹理/图案 → Layer3:物体部分 → Layer4:完整物体'; this.onerror=null;">
+            <div class="diagram-caption">📊 从简单到复杂：第一层检测边缘/颜色；中间层检测花纹、眼角；高层检测狗脸、车轮、窗户。</div>
+        </div>
+        <div class="quote">
+            🧠 “深度神经网络的可解释性：每一层都在自动学习更有意义、更抽象的特征表示。”
+        </div>
+    </div>
+
+    <!-- 5. 池化层 + CNN经典结构和发展脉络 -->
+    <div class="slide">
+        <span class="chapter-badge">📐 结构演进</span>
+        <h2>池化 & 现代CNN家族</h2>
+        <div class="two-column">
+            <div class="col">
+                <h3>🌊 池化层 (Pooling)</h3>
+                <ul class="bullet-list">
+                    <li><strong>最大池化</strong>：2×2窗口保留最大值 → 降维 + 平移不变性</li>
+                    <li>减少计算量，缓解过拟合，扩大感受野</li>
+                </ul>
+            </div>
+            <div class="col">
+                <h3>⏳ 发展时间线</h3>
+                <ul class="bullet-list">
+                    <li><strong>1998 LeNet-5</strong> — 手写数字识别，CNN鼻祖</li>
+                    <li><strong>2012 AlexNet</strong> — ImageNet革命，深度+GPU+ReLU</li>
+                    <li><strong>2014 VGG / GoogLeNet</strong> — 更深，Inception模块</li>
+                    <li><strong>2015 ResNet</strong> — 残差连接，可训练152层</li>
+                    <li><strong>2020+ EfficientNet/ViT</strong> — 效率优化 + Transformer结合</li>
+                </ul>
+            </div>
+        </div>
+        <div class="img-placeholder">
+            <div style="background:#eef2ff; border-radius:1rem; padding:0.8rem; text-align:center;">
+                🧱 典型结构：<strong>Input → [Conv+ReLU+Pool]×N → Flatten → FC → Softmax</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 可视化实践 CNN Explainer 链接 + 鼓励动手 -->
+    <div class="slide">
+        <span class="chapter-badge">🕹️ 互动实践</span>
+        <h2>亲眼“看穿”CNN内部</h2>
+        <div class="img-placeholder">
+            <div style="background:#fff; border-radius:1rem; padding: 1rem;">
+                <p style="font-weight:700;">🎮 CNN Explainer — 交互式可视化工具</p>
+                <p>点击卷积层、池化层，观察特征图实时变化，调整核大小/步长，理解每一维变换。</p>
+                <a href="https://poloclub.github.io/cnn-explainer/" target="_blank" class="btn-demo">✨ 打开 CNN Explainer 互动演示 ✨</a>
+                <div class="diagram-caption" style="margin-top:0.8rem;">🔗 推荐课后亲自操作：拖动滑块，看卷积核滑动，特征图如何从边缘逐渐抽象</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

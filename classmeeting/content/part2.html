@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>班会 · 人工智能的发展 | 神经元·感知机·多层网络 | LaTeX公式</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- MathJax 核心库，渲染 LaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #0f172a;
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .slides-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .slide {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.2);
+            padding: 2rem 2rem 2.5rem;
+            transition: transform 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .slide:hover {
+            transform: translateY(-3px);
+        }
+
+        .chapter-badge {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid #3b82f6;
+            padding-left: 1rem;
+            color: #0f172a;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin: 1rem 0 0.6rem 0;
+            color: #1e40af;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0 1.5rem;
+        }
+        .info-card {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.4rem;
+            flex: 1 1 240px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+        }
+        .info-card strong {
+            font-size: 1.2rem;
+            color: #2563eb;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* LaTeX 公式显示区域 */
+        .math-block {
+            background: #eef2ff;
+            padding: 1rem 1.4rem;
+            border-radius: 1.2rem;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 1rem 0;
+            overflow-x: auto;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .two-column {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            margin: 1rem 0;
+        }
+        .col {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .formula-light {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1.2rem;
+            font-family: monospace;
+            font-weight: 500;
+            border: 1px solid #cbd5e1;
+        }
+
+        .img-placeholder {
+            background: #f1f5f9;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            text-align: center;
+            border: 1px dashed #94a3b8;
+            margin: 1rem 0;
+        }
+        .img-placeholder img {
+            max-width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .diagram-caption {
+            font-size: 0.8rem;
+            color: #475569;
+            margin-top: 0.5rem;
+        }
+
+        .quote {
+            background: #fef9e3;
+            border-left: 6px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            border-radius: 1.2rem;
+            margin: 1.2rem 0;
+        }
+
+        .update-rule {
+            background: #e6f7e6;
+            padding: 1rem;
+            border-radius: 1.2rem;
+            font-family: monospace;
+        }
+
+        .footnote {
+            font-size: 0.8rem;
+            color: #475569;
+            text-align: center;
+            margin-top: 1.8rem;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 1rem;
+        }
+        @media (max-width: 700px) {
+            .slide { padding: 1.5rem; }
+            h1 { font-size: 1.9rem; }
+            h2 { font-size: 1.5rem; }
+        }
+        .bullet-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .bullet-list li {
+            margin-bottom: 0.6rem;
+            padding-left: 1.4rem;
+            position: relative;
+        }
+        .bullet-list li::before {
+            content: "▹";
+            color: #3b82f6;
+            position: absolute;
+            left: 0;
+        }
+        /* 确保行内公式与文字协调 */
+        mjx-container {
+            display: inline-flex !important;
+        }
+    </style>
+</head>
+<body>
+<div class="slides-container">
+    <!-- 封面：AI发展史专题 -->
+    <div class="slide">
+        <span class="chapter-badge">🧬 演进之路</span>
+        <h1>人工智能的发展<br>从神经元到深层网络</h1>
+        <div class="card-grid">
+            <div class="info-card"><strong>1945起 · ANN雏形</strong> 模拟大脑，加权求和</div>
+            <div class="info-card"><strong>1958 · 感知机</strong> 弗兰克·罗森布拉特，开创性学习算法</div>
+            <div class="info-card"><strong>→ 多层感知机</strong> 突破线性不可分，开启深度学习时代</div>
+        </div>
+        <div class="quote">✨ “神经网络的每一次迭代，都是对智能本质的追问。” — 班会 · 理解AI的骨架</div>
+    </div>
+
+    <!-- 第一部分：人工神经网络 ANN -->
+    <div class="slide">
+        <span class="chapter-badge">🧠 起源：人工神经网络</span>
+        <h2>ANN · 最初的模拟</h2>
+        <div class="two-column">
+            <div class="col">
+                <h3>📡 设计思想</h3>
+                <p>模拟人类大脑神经元结构：输入 \( (x_1, x_2, \dots, x_n) \) 对应多个树突信号，通过权重加权，判断是否激活。</p>
+                <div class="math-block">
+                    <strong>早期模型表示</strong><br>
+                    \[
+                    \mathbb{I}\left( \sum_{i=1}^{n} w_i x_i \ge 0 \right)
+                    \]
+                </div>
+                <p>其中 \( w_i \) 是权重，模拟突触强度；\(\mathbb{I}\) 为指示函数（阶跃）。</p>
+            </div>
+            <div class="col">
+                <h3>⚠️ 局限性</h3>
+                <ul class="bullet-list">
+                    <li>仅相当于<strong>加权平均数</strong> + 阈值判断</li>
+                    <li><strong>参数 \( w_i \) 不会自动更新</strong> → 需要人工手动调整权重</li>
+                    <li>缺乏学习能力，无法拟合复杂数据模式</li>
+                    <li>本质上是一个线性分类器雏形，但无反馈机制</li>
+                </ul>
+                <div class="quote" style="margin-top: 0.5rem;">📌 它奠定了“连接主义”的基石，但参数固定，离真正的智能还很远。</div>
+            </div>
+        </div>
+        <div class="footnote">ANN时代背景：1943年 McCulloch & Pitts 提出M-P神经元模型，后续不断演进。</div>
+    </div>
+
+    <!-- 第二部分：感知机 (Perceptron) 飞跃 -->
+    <div class="slide">
+        <span class="chapter-badge">⚡ 里程碑：感知机</span>
+        <h2>1958 · 弗兰克·罗森布拉特</h2>
+        <div class="two-column">
+            <div class="col">
+                <h3>➕ 两大关键改进</h3>
+                <ul class="bullet-list">
+                    <li><strong>偏置 (bias)</strong>：使决策边界不必经过原点，表达能力提升。</li>
+                    <li><strong>激活函数</strong>：模拟神经元“兴奋/抑制”，引入非线性（阶跃/sigmoid早期形式）。</li>
+                    <li><strong>学习算法</strong>：权重可以根据误差自动迭代更新！</li>
+                </ul>
+                <div class="math-block">
+                    感知机输出：<br>
+                    \[
+                    \hat{y} = f\left( \sum_{i=1}^{n} w_i x_i + b \right)
+                    \]
+                    （\( f \) 为激活函数）
+                </div>
+            </div>
+            <div class="col">
+                <h3>🐚 生物神经元对比</h3>
+                <div class="img-placeholder">
+                    <img src="https://hml.boyuai.com/static/neuron_1.drawio.904876b9.png" alt="生物神经元结构" style="max-width:100%; background:#fff;">
+                    <div class="diagram-caption">生物神经元：树突 → 细胞体 → 轴突 → 突触</div>
+                </div>
+            </div>
+        </div>
+        <div class="img-placeholder">
+            <img src="https://hml.boyuai.com/static/perceptron.drawio.6c27951c.png" alt="感知机模型示意图">
+            <div class="diagram-caption">感知机模型：输入加权 + 偏置 → 激活函数 → 输出， 与生物神经元惊人相似！</div>
+        </div>
+        <div class="quote">
+            🤖 “比较两者是不是明白了感知机的设计理念？” — 从仿生学到数学模型，感知机是人工智能历史上第一个具备完整学习算法的人工神经网络。
+        </div>
+    </div>
+
+    <!-- 第三部分：感知机的学习规则（负反馈更新） -->
+    <div class="slide">
+        <span class="chapter-badge">🔄 核心：自动迭代更新</span>
+        <h2>负反馈机制 & 权重更新法则</h2>
+        <div class="two-column">
+            <div class="col">
+                <p>罗森布拉特从生物<strong>负反馈</strong>中获得灵感：模型根据输出误差实时调整参数。</p>
+                <div class="update-rule">
+                    <strong>📐 更新规则 (δ法则雏形)</strong><br>
+                    模型输出：\(\hat{y}\) &nbsp;&nbsp; 真实标签：\(y\)<br>
+                    误差信号：\(\delta = \hat{y} - y\)<br><br>
+                    对每个权重 \(w_i\)：<br>
+                    \[
+                    w_i \leftarrow w_i + (\hat{y} - y) \cdot x_i
+                    \]<br>
+                    偏置更新：<br>
+                    \[
+                    b \leftarrow b + (\hat{y} - y)
+                    \]
+                </div>
+                <p style="margin-top: 0.8rem;">\(\leftarrow\) 符号表示赋值(右往左)，通过误差驱动，模型逐步减少分类错误。</p>
+            </div>
+            <div class="col">
+                <h3>🧪 直观理解</h3>
+                <ul class="bullet-list">
+                    <li>若预测正确 (\(\hat{y}=y\)) → 参数不改变</li>
+                    <li>若预测偏大 (\(\hat{y}=1, y=0\)) → 减小对应权重，降低该类得分</li>
+                    <li>若预测偏小 (\(\hat{y}=0, y=1\)) → 增大权重，提高正确概率</li>
+                    <li>这是<strong>在线学习</strong> 最朴素的实现，为反向传播埋下伏笔！</li>
+                </ul>
+                <div class="quote" style="margin-top: 0.3rem;">✨ 感知机的伟大之处：让机器<strong>自动从错误中学习</strong>，权重不再需要人工设定。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第四部分：多层感知机 MLP 与 非线性突破 -->
+    <div class="slide">
+        <span class="chapter-badge">🏗️ 进化：多层感知机</span>
+        <h2>从单层到深层 · 解决线性不可分难题</h2>
+        <div class="two-column">
+            <div class="col">
+                <p>单层感知机被指出无法解决<strong>异或(XOR)</strong>问题（1969年Minsky论文），导致神经网络沉寂十年。而<strong>多层感知机 (MLP)</strong> 引入<strong>隐藏层</strong> + <strong>非线性激活</strong>，打破局限！</p>
+                <ul class="bullet-list">
+                    <li>输入层 → 一个或多个隐藏层 → 输出层</li>
+                    <li>每个神经元采用非线性激活（sigmoid, tanh, ReLU）</li>
+                    <li>反向传播算法（1986 Rumelhart等）使多层网络可训练</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="img-placeholder">
+                    <img src="https://hml.boyuai.com/static/feedforward.drawio.55f3bd42.png" alt="前馈神经网络结构图 (MLP)" style="max-width:100%;" onerror="this.onerror=null; this.outerHTML='<div style=\'padding:1rem;background:#eef2ff;border-radius:1rem;\'>⚠️ 示意图加载失败，但典型MLP结构：输入层 → 隐藏层1 → 隐藏层2 → 输出层，全连接前馈网络。</div>';">
+                    <div class="diagram-caption">多层感知机（前馈神经网络）示意图 — 多个隐藏层提取高维特征</div>
+                </div>
+            </div>
+        </div>
+        <div class="math-block">
+            <strong>📈 隐藏层的力量 (前向传播)</strong><br>
+            \[
+            \begin{aligned}
+            \mathbf{h}_1 &= \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) \\
+            \mathbf{h}_2 &= \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2) \\
+            \hat{y} &= \mathbf{W}_3 \mathbf{h}_2 + \mathbf{b}_3 \quad (\text{分类/回归})
+            \end{aligned}
+            \]
+        </div>
+        <div class="quote">
+            💡 深层结构使得网络能拟合任意复杂函数（万能逼近定理），也是如今深度学习的基石。感知机 -> MLP -> 深度神经网络，一脉相承。
+        </div>
+        <div class="footnote">现代大模型（如DeepSeek）本质上是极大规模的多层神经网络 + 注意力机制。</div>
+    </div>
+</div>
+</body>
+</html>
