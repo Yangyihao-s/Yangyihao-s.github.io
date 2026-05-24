@@ -1,15 +1,242 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>HI (*´▽｀)ノノ</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>✨ 欢迎光临 | (*´▽`*)ノノ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #fef9f0 0%, #fff5e6 100%);
+            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, 'Helvetica Neue', 'Noto Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+        }
+
+        /* 主卡片容器 — 优雅居中 + 柔和质感 */
+        .hero-card {
+            max-width: 820px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(0px);
+            border-radius: 64px 48px 72px 48px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.8);
+            padding: 2.2rem 2rem 2.8rem;
+            transition: all 0.25s ease;
+            text-align: center;
+            border: 1px solid rgba(255, 245, 215, 0.7);
+        }
+
+        @media (max-width: 560px) {
+            .hero-card {
+                padding: 1.8rem 1.2rem 2.2rem;
+                border-radius: 48px 32px 56px 32px;
+            }
+        }
+
+        /* 头部组合 — HI + 可爱的颜文字 */
+        .greeting-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.4rem 0.8rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .hi-text {
+            font-size: clamp(2.8rem, 8vw, 4.4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #FB8B67, #F45C43);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.01em;
+            text-shadow: 2px 2px 12px rgba(251, 139, 103, 0.2);
+        }
+
+        .kaomoji {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 500;
+            color: #F45C43;
+            display: inline-block;
+            transform: rotate(0deg);
+            transition: transform 0.2s ease;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.08));
+        }
+
+        .hero-card:hover .kaomoji {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        /* 可爱的动物插图区域 — 完全居中且优雅 */
+        .image-wrapper {
+            margin: 1.2rem 0 1.6rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cute-img {
+            max-width: 78%;
+            height: auto;
+            border-radius: 48px;
+            box-shadow: 0 18px 28px -12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 3px solid rgba(255,255,210,0.7);
+            background: #fff9ef;
+            display: block;
+        }
+
+        .cute-img:hover {
+            transform: scale(1.01) translateY(-4px);
+            box-shadow: 0 28px 35px -14px rgba(244, 92, 67, 0.25);
+            border-color: #ffe0b5;
+        }
+
+        /* 欢迎文案 — 优雅大气 */
+        .welcome-title {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            color: #2d3e50;
+            margin: 1rem 0 0.6rem 0;
+            letter-spacing: -0.3px;
+            background: linear-gradient(120deg, #2c3e4e, #1d2c38);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+            padding-bottom: 4px;
+            border-bottom: 2px dashed #fbc4ab;
+        }
+
+        /* 装饰分割线 */
+        .soft-divider {
+            width: 70px;
+            height: 3px;
+            background: linear-gradient(90deg, #FBC4AB, #F98C6A, #FBC4AB);
+            margin: 1rem auto 1.5rem auto;
+            border-radius: 10px;
+        }
+
+        /* 导航栏 — 现代磨砂玻璃风格+居中 */
+        .nav-bar {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 248, 235, 0.9);
+            backdrop-filter: blur(2px);
+            padding: 0.9rem 2.2rem;
+            border-radius: 60px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: #c23b1e;
+            border: 1px solid #ffe1c4;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-link::before {
+            content: "🌸";
+            font-size: 1.3rem;
+            transition: transform 0.2s;
+        }
+
+        .nav-link:hover::before {
+            transform: rotate(12deg) scale(1.1);
+        }
+
+        .nav-link:hover {
+            background: #fff5ea;
+            border-color: #f7a27e;
+            box-shadow: 0 12px 20px -12px rgba(244, 92, 67, 0.4);
+            transform: translateY(-3px);
+            color: #b13212;
+        }
+
+        /* 底部悄悄加一点小可爱 */
+        .footer-note {
+            margin-top: 2.3rem;
+            font-size: 0.8rem;
+            color: #cb9e85;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .footer-note span {
+            font-size: 0.9rem;
+        }
+
+        .footer-note:hover {
+            opacity: 1;
+        }
+
+        /* 确保图片原始路径存在优雅降级，万一图片丢失也有美观占位 */
+        .cute-img {
+            background: #f9e5d4;
+            object-fit: cover;
+        }
+
+        /* 响应式保障: 小屏缩小内边距，但依然居中 */
+        @media (max-width: 480px) {
+            .nav-link {
+                padding: 0.7rem 1.6rem;
+                font-size: 1rem;
+            }
+            .nav-link::before {
+                font-size: 1.1rem;
+            }
+            .cute-img {
+                max-width: 92%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>HI (*´▽｀)ノノ</h1> <img src="images/5f2a983a55c9f0fc6d1041ff78d50d0fd1265133.jpg" style="zoom:50%;" />
-    <h1>欢迎来到我的网站！</h1>
+
+<div class="hero-card">
+    <!-- 组合标题区：保持原始“HI” + 颜文字气氛 -->
+    <div class="greeting-area">
+        <span class="hi-text">HI</span>
+        <span class="kaomoji">(*´▽`*)ノノ</span>
+    </div>
+
+    <!-- 图片居中区域：保留原始图片路径，增加圆润感及交互，不再使用zoom，改用响应式max-width -->
+    <div class="image-wrapper">
+        <img class="cute-img" src="images/5f2a983a55c9f0fc6d1041ff78d50d0fd1265133.jpg" >
+    </div>
+
+    <!-- 欢迎来到我的网站！居中且更有设计感 -->
+    <div>
+        <div class="welcome-title">✨ 欢迎来到我的网站！ ✨</div>
+    </div>
 
     <div class="nav-bar">
         <a href="classmeeting/classmeeting.html" class="nav-link"> Class Meeting</a>
     </div>
+</div>
 
 </body>
 </html>
