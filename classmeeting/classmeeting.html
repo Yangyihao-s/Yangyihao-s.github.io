@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>内容导航 | 四章节优雅跳转</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'SF Pro Text', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fc 0%, #e9eef4 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* 柔和光晕背景 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at 15% 25%, rgba(79, 70, 229, 0.06), transparent 65%);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+            right: 0;
+            background: radial-gradient(circle at 90% 75%, rgba(6, 182, 212, 0.05), transparent 70%);
+            pointer-events: none;
+        }
+
+        /* 主容器 */
+        .glass-card {
+            max-width: 720px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255,255,255,0.7);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 28px 48px -15px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* 顶部渐变区域 */
+        .hero-section {
+            background: linear-gradient(110deg, #0f172a 0%, #1e293b 100%);
+            padding: 2rem 2rem 1.6rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-section h1 {
+            font-size: 2rem;
+            font-weight: 650;
+            letter-spacing: -0.3px;
+            background: linear-gradient(120deg, #ffffff, #cbd5e6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-section p {
+            font-size: 0.95rem;
+            color: #cbd5e6;
+            opacity: 0.85;
+            margin-top: 0.3rem;
+        }
+
+        .dir-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            font-family: 'SF Mono', monospace;
+            color: #e2e8f0;
+            border: 0.5px solid rgba(255,255,255,0.2);
+        }
+
+        /* 内容区域 */
+        .content-panel {
+            padding: 2rem 2rem 1.8rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 1.8rem;
+            border-bottom: 2px solid #eef2f8;
+            padding-bottom: 0.7rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.45rem;
+            font-weight: 600;
+            color: #0a0f1c;
+            letter-spacing: -0.2px;
+        }
+
+        .chapter-count {
+            background: #eef2ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2563eb;
+            font-family: monospace;
+        }
+
+        /* 链接列表网格 (四个部分优雅展示) */
+        .links-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .chapter-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: 1.4rem;
+            padding: 0.9rem 1.5rem;
+            text-decoration: none;
+            color: #1f2a44;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border: 1px solid #eef2fa;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chapter-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            border-radius: 2px 0 0 2px;
+        }
+
+        .chapter-card:hover::before {
+            opacity: 1;
+        }
+
+        .chapter-card:hover {
+            background: #fefefe;
+            border-color: #cbdff2;
+            transform: translateX(6px);
+            box-shadow: 0 12px 22px -10px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card-icon {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(145deg, #f0f4fe, #e8edf9);
+            border-radius: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            transition: all 0.2s;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .chapter-card:hover .card-icon {
+            background: #e2eaff;
+            transform: scale(0.96);
+        }
+
+        .card-info {
+            line-height: 1.4;
+        }
+
+        .card-info strong {
+            font-size: 1.15rem;
+            font-weight: 650;
+            color: #0f172a;
+        }
+
+        .file-name {
+            font-size: 0.7rem;
+            font-family: 'SF Mono', monospace;
+            background: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            margin-left: 0.6rem;
+            color: #475569;
+            letter-spacing: 0.2px;
+        }
+
+        .desc-text {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            display: block;
+            margin-top: 0.1rem;
+        }
+
+        .arrow-symbol {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .chapter-card:hover .arrow-symbol {
+            transform: translateX(5px);
+            color: #3b82f6;
+        }
+
+        /* 提示卡片 */
+        .tip-box {
+            margin-top: 2rem;
+            background: #f8fafd;
+            border-radius: 1.2rem;
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.8rem;
+            color: #2c3e66;
+            border-left: 3px solid #3b82f6;
+            backdrop-filter: blur(2px);
+        }
+
+        .tip-icon {
+            font-size: 1.2rem;
+        }
+
+        .tip-box code {
+            background: #e6edf5;
+            padding: 0.2rem 0.45rem;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #1e40af;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 1rem 1.2rem;
+            font-size: 0.7rem;
+            border-top: 1px solid #ecf3f0;
+            background: rgba(249, 250, 252, 0.7);
+            color: #5c6f87;
+        }
+
+        /* 响应式 */
+        @media (max-width: 520px) {
+            body {
+                padding: 1rem;
+            }
+            .hero-section h1 {
+                font-size: 1.6rem;
+            }
+            .content-panel {
+                padding: 1.4rem;
+            }
+            .chapter-card {
+                padding: 0.7rem 1rem;
+            }
+            .card-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+            .card-info strong {
+                font-size: 1rem;
+            }
+            .file-name {
+                display: none;
+            }
+            .desc-text {
+                font-size: 0.68rem;
+            }
+        }
+
+        /* 进场动画 */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chapter-card {
+            animation: fadeUp 0.3s ease backwards;
+            animation-delay: calc(var(--order, 0) * 0.07s);
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card">
+    <div class="hero-section">
+        <h1>📖 章节导航</h1>
+        <p>轻量直达 · content 子目录内容</p>
+        <div class="dir-badge">
+            📁 ./content/ &nbsp;|&nbsp; part1 ~ part4
+        </div>
+    </div>
+
+    <div class="content-panel">
+        <div class="section-header">
+            <h2>✨ 精选章节</h2>
+            <span class="chapter-count">共 4 部分</span>
+        </div>
+
+        <div class="links-grid" id="dynamicLinks">
+            <!-- 动态生成 part1 到 part4 的精美卡片 -->
+        </div>
+
+        <div class="tip-box">
+            <div class="tip-icon">🔍</div>
+            <div>
+                点击卡片将跳转至 <code>content/partX.html</code>。<br>
+                <span style="font-size:0.7rem;">💡 提示：请确保已在仓库根目录下创建 <strong>content</strong> 文件夹，并放入 part1.html ~ part4.html</span>
+            </div>
+        </div>
+    </div>
+    <footer>
+        🧭 优雅导航 | 支持移动端 · 精确匹配 part1 至 part4
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // 配置: 只需要 part1 到 part4
+        const START = 1;
+        const END = 4;          // 只有4个部分
+        const BASE_DIR = 'content';
+        const FILE_PREFIX = 'part';
+        const EXT = '.html';
+        
+        // 为每个part提供独特的图标与描述 (让UI更有质感)
+        const iconCollection = ['🌿', '📌', '⚡', '🎯'];
+        const descriptionList = [
+            '基础入门 · 核心概念',
+            '进阶技巧 · 实用组合',
+            '深度剖析 · 案例详解',
+            '总结回顾 · 要点精粹'
+        ];
+        
+        const container = document.getElementById('dynamicLinks');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        for (let i = START; i <= END; i++) {
+            const fileName = `${FILE_PREFIX}${i}${EXT}`;
+            const targetPath = `./${BASE_DIR}/${fileName}`;
+            const iconIdx = (i - 1) % iconCollection.length;
+            const descIdx = (i - 1) % descriptionList.length;
+            
+            const card = document.createElement('a');
+            card.className = 'chapter-card';
+            // 自定义顺序属性用于动画延迟
+            card.style.setProperty('--order', i - 1);
+            card.href = targetPath;
+            // 优化title展示路径
+            card.title = `跳转至 ${targetPath}`;
+            
+            // 构造卡片内容
+            card.innerHTML = `
+                <div class="card-left">
+                    <div class="card-icon">${iconCollection[iconIdx]}</div>
+                    <div class="card-info">
+                        <div>
+                            <strong>${FILE_PREFIX}${i}</strong>
+                            <span class="file-name">${fileName}</span>
+                        </div>
+                        <span class="desc-text">${descriptionList[descIdx]}</span>
+                    </div>
+                </div>
+                <div class="arrow-symbol">→</div>
+            `;
+            
+            container.appendChild(card);
+        }
+        
+        // 附加一个优雅的后备：如果因为某些意外没生成任何内容
+        if (container.children.length === 0) {
+            container.innerHTML = '<div class="tip-box" style="justify-content:center;">⚠️ 未生成链接，请检查配置范围</div>';
+        }
+        
+        // 控制台友好提示
+        console.log('✅ 已生成 part1.html ~ part4.html 跳转卡片，目标目录: content/');
+    })();
+</script>
+
+<!-- 极简 noscript 备用支持 -->
+<noscript>
+    <div style="position:fixed; bottom:20px; left:20px; right:20px; background:#1e293b; color:white; border-radius:20px; padding:12px; text-align:center; z-index:999;">
+        您的浏览器未启用 JavaScript，显示基础链接： <a href="content/part1.html" style="color:#93c5fd;">part1</a> | <a href="content/part2.html" style="color:#93c5fd;">part2</a> | <a href="content/part3.html" style="color:#93c5fd;">part3</a> | <a href="content/part4.html" style="color:#93c5fd;">part4</a>
+    </div>
+</noscript>
+</body>
+</html>
