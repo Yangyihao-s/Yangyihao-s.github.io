@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>DeepSeek-V3 · 知识点智能拓展助手 | 自动搜索 & 学习建议</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #0a2b3e;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(0, 102, 204, 0.12);
+            backdrop-filter: blur(2px);
+            color: #0066cc;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            margin-bottom: 1rem;
+            letter-spacing: 0.3px;
+            border: 0.5px solid rgba(0,102,204,0.2);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0B2B40, #1E4A6F);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            color: #3a5a78;
+            font-size: 1rem;
+            margin-top: 0.25rem;
+            border-bottom: 1px solid #cbdde9;
+            display: inline-block;
+            padding-bottom: 0.25rem;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-area {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            font-weight: 600;
+            color: #1f3a4b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .topic-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        input#topicInput {
+            flex: 1;
+            padding: 1rem 1.3rem;
+            font-size: 1rem;
+            border: 1.5px solid #e2edf2;
+            border-radius: 2rem;
+            background: #fefefe;
+            transition: 0.2s;
+            font-weight: 500;
+            color: #0a2b3e;
+            outline: none;
+        }
+
+        input#topicInput:focus {
+            border-color: #1e6fdf;
+            box-shadow: 0 0 0 3px rgba(30,111,223,0.2);
+        }
+
+        button {
+            background: #1f3f6f;
+            border: none;
+            padding: 0.9rem 2rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        button:hover {
+            background: #0f2e52;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -8px rgba(0, 32, 64, 0.3);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .api-status {
+            background: #eef2fa;
+            border-radius: 1.5rem;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.8rem;
+            color: #1f6392;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 1rem;
+            border: 1px solid #cde3f0;
+        }
+
+        .api-status span:first-child {
+            font-weight: 600;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: #fafdff;
+            border-radius: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2edf2;
+            border-top: 4px solid #1e6fdf;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .result-area {
+            background: #ffffffdb;
+            border-radius: 1.8rem;
+            padding: 0.2rem 0;
+        }
+
+        .result-content {
+            font-family: 'Inter', system-ui;
+            line-height: 1.55;
+            color: #1f2f3e;
+        }
+
+        .result-content h1, .result-content h2, .result-content h3 {
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .result-content h2 {
+            border-left: 5px solid #1e6fdf;
+            padding-left: 1rem;
+            color: #1a3b5c;
+        }
+
+        .result-content p {
+            margin: 0.8rem 0;
+        }
+
+        .result-content ul, .result-content ol {
+            margin: 0.6rem 0 0.6rem 1.8rem;
+        }
+
+        .result-content li {
+            margin: 0.4rem 0;
+        }
+
+        .result-content blockquote {
+            background: #f0f6fe;
+            padding: 0.7rem 1.2rem;
+            border-radius: 1.2rem;
+            border-left: 4px solid #1e6fdf;
+            margin: 1rem 0;
+        }
+
+        pre {
+            background: #1e2a36;
+            color: #eef2ff;
+            padding: 1rem;
+            border-radius: 1.2rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b8a9f;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #7c8f9f;
+            margin-top: 2rem;
+            border-top: 1px solid #d4e2ec;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .card { padding: 1.3rem; }
+            button { padding: 0.7rem 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="badge">🚀 DeepSeek-V3 · SiliconFlow 赋能</div>
+        <h1>🧠 知识点智能拓展助手</h1>
+        <div class="sub">自动知识拓展 · 模拟搜索资料 · 结构化学习建议</div>
+    </div>
+
+    <div class="card input-area">
+        <label>📖 输入核心知识点</label>
+        <div class="topic-input-wrapper">
+            <input type="text" id="topicInput" placeholder="例如：量子机器学习 / 图神经网络 / 多模态检索增强生成" value="Transformer 注意力机制">
+            <button id="exploreBtn">✨ 智能探索 & 生成报告</button>
+        </div>
+        <div class="api-status">
+            <span>🔌 已接入 API: </span>
+            <code style="background:#ffffff; padding:2px 8px; border-radius:30px;">https://api.siliconflow.cn/v1</code>
+            <span>模型: <strong>deepseek-ai/DeepSeek-V3</strong></span>
+            <span style="margin-left: auto;">✅ 预置可用 (无需手动输入Key)</span>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 12px; color: #56748c;">✨ 基于强大的 DeepSeek-V3 进行深度知识点拆解、模拟搜索检索与学习路径规划 (无真实联网, 但模型具备海量知识+逻辑拓展)</p>
+    </div>
+
+    <div id="resultContainer" class="card result-area">
+        <div class="empty-state" id="emptyPlaceholder">
+            🌱 输入任意知识点，助手将自动完成：<br>
+            📍 多维知识拓展 → 🔍 资料检索(模拟真实学术/技术来源) → 💡 系统化学习建议 + 动手项目推荐
+        </div>
+        <div id="resultContent" style="display: none;" class="result-content"></div>
+    </div>
+    <footer>
+        ⚡ 基于 SiliconFlow API + DeepSeek-V3 | 无需额外密钥，自动生成结构化拓展报告 (含模拟搜索资料)
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // ---------- 固定可用 API 配置 ----------
+        const API_BASE_URL = "https://api.siliconflow.cn/v1";
+        const API_KEY = "sk-kntipkoajuhfdteljkgawkniakmayupnqgvokqwalhjvukhz";
+        const MODEL_NAME = "deepseek-ai/DeepSeek-V3";
+
+        // DOM 元素
+        const topicInput = document.getElementById('topicInput');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const emptyPlaceholder = document.getElementById('emptyPlaceholder');
+        const resultContentDiv = document.getElementById('resultContent');
+
+        // 显示加载状态
+        function showLoading() {
+            emptyPlaceholder.style.display = 'none';
+            resultContentDiv.style.display = 'block';
+            resultContentDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div style="font-weight: 500;">🤖 DeepSeek-V3 正在深度思考中...</div>
+                    <div style="font-size:0.85rem; margin-top:8px;">✔ 知识图谱拓展 → 资料检索整合 → 学习路线建议</div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            emptyPlaceholder.style.display = 'none';
+            resultContentDiv.style.display = 'block';
+            resultContentDiv.innerHTML = `
+                <div style="background: #fff2f0; border-radius: 1.5rem; padding: 1.5rem; color:#b91c1c;">
+                    <strong>❌ 请求失败</strong><br>${message}<br><br>
+                    <span style="font-size:0.85rem;">💡 提示: API 配置已内置，若网络异常可刷新重试。模型: deepseek-ai/DeepSeek-V3</span>
+                </div>
+            `;
+        }
+
+        // 调用 SiliconFlow (OpenAI 兼容格式)
+        async function callDeepSeekV3(userTopic) {
+            // 构建系统提示：要求模型严格遵循“拓展→搜索资料(模拟但真实感) → 建议”的框架
+            const systemPrompt = `你是 DeepSeek-V3，一位顶级的科研与学习规划专家。你的任务是针对用户给出的知识点，完成严谨的知识探索流程，并最终输出一份高质量报告。
+
+请严格按以下三个阶段进行（输出时需明确体现每一步）：
+## 第一步：知识拓展
+自动生成 5-8 个与该知识点密切相关的子领域、核心技术词或拓展方向（例如基础理论、关键算法、工程实践、前沿进展等）。
+
+## 第二步：搜索相关资料（模拟真实学术/技术搜索）
+基于第一步的拓展方向，模拟检索高质量资料。请至少提供 6~10 项资料条目，包含论文、博客、教程、开源项目或经典书籍。每个条目需包含：
+- 标题 / 资源名称
+- 类型（论文/教程/博客/视频/GitHub）
+- 简要摘要（30字左右说明其核心价值）
+- 推荐来源（例如 arXiv, GitHub, 知名技术博客等，模拟但不能胡编，要合理）
+
+## 第三步：给出学习与研究建议
+根据上述拓展和资料，提供清晰、结构化的学习建议：
+1. **推荐学习路径**：从入门到进阶的合理顺序。
+2. **核心关注点**：2~4 个该知识领域最值得深挖的技术/理论点。
+3. **优先阅读材料**：从第二步资料中挑选 2~3 份最核心的，并说明理由。
+4. **实践项目建议**：描述一个具体、可上手的小项目 idea，帮助巩固知识。
+
+最终输出需使用 Markdown 格式，逻辑清晰，内容详实专业，字数不少于 800 字。确保第二步的资料具有合理真实感（不要胡乱编造明显错误的作者或期刊，但允许模拟常见资源）。`;
+
+            const userPrompt = `请处理知识点：“${userTopic}”。需要包含知识拓展、模拟搜索资料列表以及完整学习建议。输出务必结构分明，用中文。`;
+
+            const requestBody = {
+                model: MODEL_NAME,
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userPrompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 4096,
+                stream: false
+            };
+
+            const response = await fetch(`${API_BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                let errorDetail = `HTTP ${response.status}`;
+                try {
+                    const errData = await response.json();
+                    errorDetail = errData.error?.message || JSON.stringify(errData);
+                } catch(e) {}
+                throw new Error(`API 错误 (${response.status}): ${errorDetail}`);
+            }
+
+            const data = await response.json();
+            if (!data.choices || !data.choices.length || !data.choices[0].message) {
+                throw new Error('API 返回数据格式异常');
+            }
+            const assistantContent = data.choices[0].message.content;
+            if (!assistantContent || assistantContent.trim().length === 0) {
+                return "模型返回内容为空，请重试。";
+            }
+            return assistantContent;
+        }
+
+        // 增强 markdown 渲染（安全且保持可读性）
+        function renderMarkdownToHTML(md) {
+            if (!md) return "<p>无内容</p>";
+            // 转义 HTML 基础字符，但保留需要渲染的 markdown 结构
+            let html = md
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            
+            // 处理链接 [text](url)
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#1e6fdf; text-decoration:underline;">$1</a>');
+            
+            // 标题 (支持 # ## ###)
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            
+            // 粗体 ** ** 和 __ __
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
+            // 斜体
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // 无序列表和有序列表的逐步解析
+            const lines = html.split('\n');
+            let inUl = false;
+            let inOl = false;
+            let resultLines = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                // 无序列表: - 或 * 开头
+                const ulMatch = line.match(/^[\s]*[-*]\s+(.*)$/);
+                // 有序列表: 数字. 开头
+                const olMatch = line.match(/^[\s]*\d+\.\s+(.*)$/);
+                
+                if (ulMatch) {
+                    if (!inUl) {
+                        if (inOl) { resultLines.push('</ol>'); inOl = false; }
+                        resultLines.push('<ul>');
+                        inUl = true;
+                    }
+                    resultLines.push(`<li>${ulMatch[1]}</li>`);
+                } 
+                else if (olMatch) {
+                    if (!inOl) {
+                        if (inUl) { resultLines.push('</ul>'); inUl = false; }
+                        resultLines.push('<ol>');
+                        inOl = true;
+                    }
+                    resultLines.push(`<li>${olMatch[1]}</li>`);
+                }
+                else {
+                    if (inUl) { resultLines.push('</ul>'); inUl = false; }
+                    if (inOl) { resultLines.push('</ol>'); inOl = false; }
+                    // 处理块引用
+                    if (line.startsWith('> ')) {
+                        resultLines.push(`<blockquote>${line.substring(2)}</blockquote>`);
+                    } else if (line.trim() === '') {
+                        resultLines.push('<br>');
+                    } else {
+                        resultLines.push(line);
+                    }
+                }
+            }
+            if (inUl) resultLines.push('</ul>');
+            if (inOl) resultLines.push('</ol>');
+            html = resultLines.join('\n');
+            
+            // 代码块简易转换
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+            // 段落处理 (将连续两个换行转为段落分隔)
+            html = html.replace(/\n\s*\n/g, '</p><p>');
+            html = '<div class="prose-content">' + html + '</div>';
+            html = html.replace(/<p><br><\/p>/g, '<p> </p>');
+            return html;
+        }
+
+        // 主探索函数
+        async function handleExplore() {
+            let topic = topicInput.value.trim();
+            if (!topic) {
+                alert("请先输入一个知识点，例如：卷积神经网络、大模型微调、碳足迹核算");
+                return;
+            }
+            
+            showLoading();
+            try {
+                const report = await callDeepSeekV3(topic);
+                // 将报告渲染为美观样式
+                const finalHtml = renderMarkdownToHTML(report);
+                resultContentDiv.innerHTML = `<div style="padding: 0.2rem 0.4rem;">${finalHtml}</div>`;
+                // 如果内容很少，增加友好提示
+                if (report.length < 200) {
+                    resultContentDiv.innerHTML += `<div style="background:#fff1e0;padding:1rem;border-radius:1rem;margin-top:1rem;">⚠️ 模型返回内容较短，可尝试更具体的知识点，DeepSeek-V3 会生成更丰富的报告。</div>`;
+                }
+            } catch (err) {
+                console.error("DeepSeek-V3 调用失败:", err);
+                let errorMsg = err.message || "网络请求失败，请检查网络连接或API可用性";
+                if (errorMsg.includes("401") || errorMsg.includes("API key")) errorMsg = "认证失败，请联系管理员检查内置 API Key 是否有效";
+                if (errorMsg.includes("429")) errorMsg = "API 请求频率过高或配额限制，请稍后重试";
+                showError(errorMsg);
+            }
+        }
+
+        // 绑定探索按钮
+        exploreBtn.addEventListener('click', () => {
+            handleExplore().catch(e => {
+                console.error(e);
+                showError("未捕获异常: " + (e.message || "请刷新页面重试"));
+            });
+        });
+        
+        // 回车触发
+        topicInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                exploreBtn.click();
+            }
+        });
+        
+        // 页面初始检查API key （预置，但可显示提示）
+        if (!API_KEY || API_KEY === "sk-kntipkoajuhfdteljkgawkniakmayupnqgvokqwalhjvukhz") {
+            console.log("使用预置 SiliconFlow API Key");
+        }
+    })();
+</script>
+</body>
+</html>
